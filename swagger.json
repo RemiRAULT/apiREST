@@ -16,6 +16,105 @@
     "host": "localhost:8080",
     "basePath": "/api",
     "paths" :{
+    "/login" : {
+        "post" : {
+            "tags": [ 
+                "Login" 
+            ], 
+            "summary" : "Login",
+            "description": "Login",
+            "produces": ["application/json"],
+            "consumes": ["application/json"],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "description": "Token",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                                "$ref": "#/definitions/usersNoId"                                                 
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Opération reussite :",
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/refreshToken"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/refreshToken" : {
+        "post" : {
+            "tags": [ 
+                "Login" 
+            ], 
+            "summary" : "Login",
+            "description": "Login",
+            "produces": ["application/json"],
+            "consumes": ["application/json"],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "description": "Token",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                                "$ref": "#/definitions/refreshToken"                                                 
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Opération reussite :",
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/accessToken"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/me" : {
+        "get" : {
+            "tags": [ 
+                "Login" 
+            ], 
+            "summary" : "Récupérer les informations de la personne connectée",
+            "description": "Récupérer les informations de la personne connectée",
+            "produces": ["application/json"],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "description": "AccessToken",
+                    "required": true,
+                    "type": "varchar",
+                    "minimum": 1
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Opération reussite :",
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/me"
+                        }
+                    }                   
+                }
+            }
+        }
+    },
         "/users" : {
             "get" : {
                 "tags": [ 
@@ -401,6 +500,39 @@
                 "remarque": {
                     "remarque": "varchar"
                 }   
+            }
+        },
+        "refreshToken": {
+            "type": "object",
+            "properties": {
+                "refreshToken": {
+                    "refreshToken": "varchar"
+                }
+            }
+        },
+        "accessToken": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "accessToken": "varchar"
+                }
+            }
+        },
+        "me": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "id": "id"
+                },
+                "name": {
+                    "name": "name"
+                },
+                "email": {
+                    "email": "email"
+                },
+                "admin": {
+                    "admin": "admin"
+                }
             }
         },
         "InvalidResponse": {

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 var mysql = require("mysql");
+const rateLimit = require("express-rate-limit");
 const app = express();
 const fs = require('fs');
 require('dotenv').config();
@@ -17,6 +18,13 @@ var corsOptions = {
   origin: "http://localhost:8081"
 };
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 100 requests per windowMs
+  message : "Trop de tentatives",
+});
+
+
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
@@ -26,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // simple route
-app.get("/", (req, res) => {
+app.get("/", limiter ,(req, res) => {
   res.json({ message: "Welcome to remi application." });
 });
 
@@ -85,15 +93,15 @@ function generateRefreshToken(user) {
 const user = {
     id: 42,
     name: 'RAULT Remi',
-    email: 'remi.rault1@gmail.com',
+    email: 'root',
     admin: true,
 };
 
 
-app.post('/login', (req, res) => {
+app.post('/api/login', limiter, (req, res) => {
 
     // TODO: fetch le user depuis la db basé sur l'email passé en paramètre
-    if (req.body.email !== 'remi.rault1@gmail.com') {
+    if (req.body.email !== 'root') {
         res.status(401).send('invalid credentials');
         return ;
     }
@@ -105,12 +113,11 @@ app.post('/login', (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     res.send({
-      accessToken,
       refreshToken,
     });
 });
 
-app.post('/refreshToken', (req, res) => {
+app.post('/api/refreshToken', (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
@@ -148,7 +155,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-app.get('/me', authenticateToken, (req, res) => {
+app.get('/api/me', authenticateToken, (req, res) => {
   res.send(req.user);
 });
 
